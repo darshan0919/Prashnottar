@@ -1,0 +1,12 @@
+.quora__content {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.quora__content__singlepost {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    align-items: flex-start;
+}
