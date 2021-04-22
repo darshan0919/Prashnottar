@@ -11,13 +11,11 @@ function Home() {
     return (
         <div className="quora">
             <QHeader />
-            {
-                <div className="quora__content">
-                    <Sidebar />
-                    <Feed singleAnswer={true} />
-                    <Widget />
-                </div>
-            }
+            <div className="quora__content">
+                <Sidebar />
+                <Feed singleAnswer={true} />
+                <Widget />
+            </div>
         </div>
     );
 }

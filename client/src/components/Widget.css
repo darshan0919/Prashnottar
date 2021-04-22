@@ -1,6 +1,6 @@
 .widget {
     position: sticky;
-    flex: 0.2;
+
     margin-left: 20px;
     display: flex;
     flex-direction: column;
@@ -8,7 +8,8 @@
     margin-right: 20px;
     border: 1px solid lightgray;
     border-radius: 5px;
-    max-height: 85vh;
+    height: 650px;
+    width: 220px;
     background-color: white;
 }
 

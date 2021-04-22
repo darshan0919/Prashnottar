@@ -23,6 +23,7 @@ import { useForm } from "../util/hooks";
 import { AuthContext } from "../context/auth";
 import MoreMenu from "./MoreMenu";
 import moment from "moment";
+import SlateEditor from "./SlateEditor";
 
 function Post({ id, singleAnswer }) {
     console.log("postID", id);
@@ -41,7 +42,7 @@ function Post({ id, singleAnswer }) {
     });
 
     useEffect(() => {
-        if (!loading) {
+        if (!loading && post) {
             getPostUser({
                 variables: {
                     id: post.getPost.user,
@@ -64,7 +65,7 @@ function Post({ id, singleAnswer }) {
     });
 
     useEffect(() => {
-        if (!loading) {
+        if (!loading && post) {
             valuesPost.question = post.getPost.question;
             valuesPost.imageUrl = post.getPost.imageUrl;
         }
@@ -86,7 +87,13 @@ function Post({ id, singleAnswer }) {
                 ...result.data.editPost,
             };
             console.log(data.getPost);
-            proxy.writeQuery({ query: FETCH_POST_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_POST_QUERY,
+                variables: {
+                    postId: id,
+                },
+                data,
+            });
         },
     });
     function editPostCallback() {
@@ -125,12 +132,21 @@ function Post({ id, singleAnswer }) {
         },
     });
 
-    //const [showAddAnswer, setShowAddAnswer] = useState(true);
+    const [showAddAnswer, setShowAddAnswer] = useState(true);
 
-    const { onChange, onSubmit, values } = useForm(createAnswerCallback, {
+    const [values, setValues] = useState({
         postId: id,
-        body: "",
+        body: JSON.stringify([
+            {
+                type: "paragraph",
+                children: [{ text: "This is editable " }],
+            },
+        ]),
     });
+
+    const onChange = (body) => {
+        setValues({ ...values, body: JSON.stringify(body) });
+    };
 
     const [createAnswer] = useMutation(CREATE_ANSWER_MUTATION, {
         variables: values,
@@ -138,19 +154,26 @@ function Post({ id, singleAnswer }) {
             const data = {
                 ...proxy.readQuery({
                     query: FETCH_POST_QUERY,
-                    variables: {
-                        postId: id,
-                    },
+                    variables: { postId: id },
                 }),
             };
             data.getPost = {
                 ...data.getPost,
                 answers: result.data.createAnswer.answers,
             };
-            proxy.writeQuery({ query: FETCH_POST_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_POST_QUERY,
+                variables: { postId: id },
+                data,
+            });
             //setShowAddAnswer(false);
 
-            values.body = "";
+            values.body = JSON.stringify([
+                {
+                    type: "paragraph",
+                    children: [{ text: "This is editable " }],
+                },
+            ]);
         },
     });
 
@@ -170,13 +193,13 @@ function Post({ id, singleAnswer }) {
                 <div className="MenuButton">
                     <MoreMenu
                         {...{
-                            Edit: () => {
-                                if (postUser.getUser.id === authUser.id)
-                                    setIsModalOpenPost(true);
+                            Edit: {
+                                func: () => setIsModalOpenPost(true),
+                                show: postUser.getUser.id === authUser.id,
                             },
-                            Delete: () => {
-                                if (postUser.getUser.id === authUser.id)
-                                    deletePost();
+                            Delete: {
+                                func: deletePost,
+                                show: postUser.getUser.id === authUser.id,
                             },
                         }}
                     />
@@ -187,68 +210,68 @@ function Post({ id, singleAnswer }) {
                     <Link className="p" to={`/posts/${id}`}>
                         {post.getPost.question}
                     </Link>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="post__btnAnswer"
-                    >
-                        Answer
-                    </button>
+                    {showAddAnswer ? (
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="post__btnAnswer"
+                        >
+                            Answer
+                        </button>
+                    ) : (
+                        <></>
+                    )}
                     <Modal
                         isOpen={IsModalOpen}
                         onRequestClose={() => setIsModalOpen(false)}
                         shouldCloseOnOverlayClick={false}
                         style={{
                             overlay: {
-                                width: 680,
-                                height: 550,
-                                backgroundColor: "rgba(0,0,0,0.8)",
+                                width: 650,
+                                height: 650,
+                                background: "none",
                                 zIndex: "1000",
                                 top: "50%",
                                 left: "50%",
-                                marginTop: "-250px",
+                                marginTop: "-400px",
                                 marginLeft: "-350px",
+                                scrollbarWidth: "1px",
                             },
                         }}
                     >
                         <div className="modal__question">
-                            <h1>{post.getPost.question}</h1>
+                            <h2>{post.getPost.question}</h2>
                             <p>
                                 asked by{" "}
                                 <span className="name">
                                     {postUser.getUser.username}
                                 </span>{" "}
-                                {""}
-                                on{" "}
-                                <span className="name">
+                                <span className="time">
                                     {moment(post.getPost.createdAt).fromNow()}
                                 </span>
                             </p>
                         </div>
-                        <Form onSubmit={onSubmit}>
-                            <div className="modal__answer">
-                                <textarea
-                                    name="body"
-                                    onChange={onChange}
-                                    value={values.body}
-                                    placeholder="Enter Your Answer"
-                                />
-                            </div>
-                            <div className="modal__button">
-                                <button
-                                    className="cancle"
-                                    onClick={() => setIsModalOpen(false)}
-                                >
-                                    Cancel
-                                </button>
-                                {true ? (
-                                    <Button type="sumbit" className="add">
-                                        Add Answer
-                                    </Button>
-                                ) : (
-                                    <></>
-                                )}
-                            </div>
-                        </Form>
+                        <div className="modal__FieldAnswer modal__SlateFieldAnswer">
+                            <SlateEditor
+                                placeholder={`Enter your answer here...`}
+                                onChange={onChange}
+                                value={JSON.parse(values.body)}
+                            />
+                        </div>
+                        <div className="modal__button">
+                            <button
+                                className="cancle"
+                                onClick={() => setIsModalOpen(false)}
+                            >
+                                Cancel
+                            </button>
+                            <Button
+                                type="submit"
+                                className="add"
+                                onClick={createAnswerCallback}
+                            >
+                                Add Answer
+                            </Button>
+                        </div>
                     </Modal>
                 </div>
                 <QuestionModal
@@ -266,17 +289,19 @@ function Post({ id, singleAnswer }) {
                     {loading ? (
                         <></>
                     ) : singleAnswer ? (
-                        post.getPost.answers
-                            .slice(0, 1)
-                            .map((Id) => (
-                                <Answer
-                                    key={Id}
-                                    id={Id}
-                                    postId={id}
-                                    postUser={postUser.getUser.id}
-                                    postQuestion={post.getPost.question}
-                                />
-                            ))
+                        post.getPost.answers.slice(0, 1).map((Id) => (
+                            <Answer
+                                key={Id}
+                                id={Id}
+                                postId={id}
+                                postUser={postUser.getUser.id}
+                                postQuestion={post.getPost.question}
+                                hasAnswered={() => {
+                                    setShowAddAnswer(false);
+                                    console.log(showAddAnswer);
+                                }}
+                            />
+                        ))
                     ) : (
                         post.getPost.answers.map((Id) => (
                             <Answer
@@ -285,6 +310,7 @@ function Post({ id, singleAnswer }) {
                                 postId={id}
                                 postUser={postUser.getUser.id}
                                 postQuestion={post.getPost.question}
+                                hasAnswered={() => setShowAddAnswer(false)}
                             />
                         ))
                     )}

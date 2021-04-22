@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { IconButton, Menu, MenuItem } from "@material-ui/core";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 const ITEM_HEIGHT = 48;
 
 export default function MoreMenu(props) {
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [options] = useState(
+        Object.keys(props).filter((option) => props[option].show)
+    );
     const open = Boolean(anchorEl);
 
     const handleClick = (event) => {
@@ -16,7 +19,7 @@ export default function MoreMenu(props) {
         setAnchorEl(null);
     };
 
-    return (
+    return options.length ? (
         <div>
             <IconButton
                 aria-label="more"
@@ -39,13 +42,13 @@ export default function MoreMenu(props) {
                     },
                 }}
             >
-                {Object.keys(props).map((option) => (
+                {options.map((option) => (
                     <MenuItem
                         key={option}
                         selected={option === "Pyxis"}
                         onClick={() => {
                             handleClose();
-                            props[option]();
+                            props[option].func();
                         }}
                     >
                         {option}
@@ -53,5 +56,7 @@ export default function MoreMenu(props) {
                 ))}
             </Menu>
         </div>
+    ) : (
+        <></>
     );
 }

@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import Modal from "react-modal";
 
 import { AuthContext } from "../context/auth";
+import SlateEditor from "./SlateEditor";
 
 import { Form } from "semantic-ui-react";
 import { Avatar, Button } from "@material-ui/core";
@@ -27,6 +28,7 @@ export default function InputModal(props) {
                     left: "50%",
                     marginTop: "-300px",
                     marginLeft: "-350px",
+                    border: "none",
                 },
             }}
         >
@@ -46,28 +48,25 @@ export default function InputModal(props) {
                     {user ? user.username : "D"} {props.action}
                 </p>
             </div>
-            <Form onSubmit={props.onSubmit}>
-                <div className="modal__Field">
-                    <Form.Input
-                        placeholder={`Enter ${props.title}...`}
-                        name="body"
-                        onChange={props.onChange}
-                        value={props.values.body}
-                        error={props.error ? true : false}
-                    />
-                </div>
-                <div className="modal__buttons">
-                    <button
-                        className="cancle"
-                        onClick={() => props.setIsModalOpen(false)}
-                    >
-                        Cancel
-                    </button>
-                    <Button type="submit" className="add">
-                        Submit
-                    </Button>
-                </div>
-            </Form>
+
+            <div className="modal__Field modal__SlateField">
+                <SlateEditor
+                    placeholder={`Enter ${props.title}...`}
+                    onChange={props.onChange}
+                    value={JSON.parse(props.values.body)}
+                />
+            </div>
+            <div className="modal__buttons">
+                <button
+                    className="cancle"
+                    onClick={() => props.setIsModalOpen(false)}
+                >
+                    Cancel
+                </button>
+                <Button type="submit" className="add" onClick={props.callBack}>
+                    Submit
+                </Button>
+            </div>
         </Modal>
     );
 }

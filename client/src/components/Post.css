@@ -1,35 +1,30 @@
 .post {
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 15px;
     background-color: white;
-    margin-top: 10px;
+    margin-bottom: 8px;
     border: 1px solid lightgray;
-    border-radius: 5px;
+    border-radius: 3px;
     box-shadow: 0px 5px 8px -9px solid rgab(0, 0, 0, 0.5);
-}
-
-.answer__info {
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-}
-
-.answer__info > .answer {
-    color: gray;
-    margin: 2px 2px 5px 2px;
 }
 
 .post__info {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    margin-top: 5px;
+}
+
+.post__info > .MuiAvatar-root {
+    height: 35px;
+    width: 35px;
 }
 
 .post__info > h4 {
     margin: 0px 0px 0px 10px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
 }
 .post__info > h4:hover {
     text-decoration: underline;
@@ -49,12 +44,12 @@
 }
 
 .post__body > .post__question {
-    margin-top: 10px;
+    margin: 10px 0px 10px 3px;
     font-weight: bold;
-    margin-bottom: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
+    font-size: 16px;
     flex: 1;
 }
 
@@ -62,18 +57,18 @@
     margin-left: auto;
     cursor: pointer;
     padding: 7px;
-    background-color: blue;
+    background-color: #b92b27;
     outline: none;
     border: none;
-    color: lightgray;
-    font-weight: 300;
-    font-size: 14px;
+    color: white;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+    font-size: 13px;
     border-radius: 33px;
 }
 
 .post__btnAnswer:hover {
-    color: blue;
-    background: lightgray;
+    background-color: #8f1f1b;
 }
 
 .post__question > .p {
@@ -89,11 +84,12 @@
 
 .post__single__answer {
     border-top: 2px solid lightgrey;
+    font-size: 15px;
 }
 
 .post__single__answer > p {
-    margin-top: 10px;
-    margin-left: 8px;
+    margin: 10px 0px 10px 8px;
+    font-size: 15px;
 }
 
 .post__body > img {
@@ -113,29 +109,41 @@
 
 .post__footer > .MuiSvgIcon-root {
     color: gray;
-    margin-right: 5px;
-    margin-left: 5px;
+    margin-right: 3px;
+    margin-left: 8px;
     cursor: pointer;
 }
 
+.post__footer > .values {
+    margin-bottom: 2px;
+}
+
 .post__footerAction {
-    background-color: lightgray;
-    padding: 5px;
+    background-color: rgb(241, 241, 241);
+    padding: 6px;
     align-items: center;
     display: flex;
     justify-content: space-around;
     border-radius: 33px;
 }
 .post__footerAction > .MuiSvgIcon-root {
-    color: gray;
+    color: grey;
     margin-right: 5px;
     cursor: pointer;
 }
 .post__footerAction > span {
-    margin: 0px 3px 0px 4px;
-    font-size: x-large;
+    margin: 0px 2px 0px 5px;
+    font-size: large;
+    top: 0;
     color: grey;
     align-self: center;
+    height: max-content;
+}
+
+.post__footerAction > .values {
+    color: gray;
+    font-size: 15px;
+    margin: 0px 3px 0px 0px;
 }
 
 .post__footerAction > .MuiSvgIcon-root:hover {
@@ -152,13 +160,27 @@
     margin-left: 30px;
 }
 
+.modal__FieldAnswer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    flex: 1;
+    padding: 10px;
+    min-height: 350px;
+}
+
+.modal__SlateFieldAnswer {
+    border: 1px solid lightgray;
+    border-radius: 2px;
+}
+
 .modal__question {
     display: flex;
     align-items: center;
     flex-direction: column;
 }
 
-.modal__question > h1 {
+.modal__question > h2 {
     color: #8f1f1b;
     font-weight: 600;
     margin-bottom: 10px;
@@ -166,7 +188,7 @@
 
 .modal__question > p {
     color: gray;
-    font-size: small;
+    font-size: 16px;
 }
 
 .modal__question > p > .name {
@@ -192,8 +214,7 @@
 .modal__button {
     display: flex;
     align-items: center;
-    margin-right: -20px;
-    border-top: 1px solid lightgray;
+    margin: 15px -8px 0px 0px;
 }
 
 .modal__button > .cancle {
@@ -221,7 +242,20 @@
     cursor: pointer;
 }
 
-.comments {
+.answer__info {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+
+.answer__info > .answer {
+    color: gray;
+    margin: 8px 2px 2px 2px;
+    font-size: 13px;
+}
+
+.post__answer > .comments {
+    font-size: 14px;
     color: gray;
     margin: 10px 0px 8px 0px;
     padding: 5px;
@@ -237,24 +271,40 @@
     margin-bottom: 0px;
 }
 
-.comment {
+.single__comment {
     margin: 10px 0px 8px 0px;
     border-bottom: 1px solid lightgrey;
     border-top: none;
+}
+
+.single__comment > p {
+    font-size: 15px;
 }
 
 .reply__info {
     margin-left: 8px;
 }
 
-.reply__info > h4 {
+.reply__info > h5 {
     margin-bottom: 0px;
 }
 
-.reply {
+.post__info > .reply {
+    height: 32px;
+    width: 32px;
+}
+
+.single__reply {
     margin: 10px 0px 10px 10px;
     border: none;
-    border-left: lightgrey 1px solid;
-    border-radius: 5px;
-    padding: 3px;
+    border-left: lightgrey 1.5px solid;
+    padding: 5px;
+}
+
+.single__reply > p {
+    font-size: 14px;
+}
+
+.single__reply > .post__footerAction {
+    padding: 2px;
 }

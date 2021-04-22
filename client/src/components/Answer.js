@@ -19,15 +19,21 @@ import {
     UPVOTE_ANSWER_MUTATION,
     DOWNVOTE_ANSWER_MUTATION,
     CREATE_COMMENT_MUTATION,
-    DELETE_COMMENT_MUTATION,
     DELETE_ANSWER_MUTATION,
     FETCH_POST_QUERY,
 } from "../util/graphql";
 import { useForm } from "../util/hooks";
 import { AuthContext } from "../context/auth";
 import InputModal from "./InputModal";
+import SlateEditor from "./SlateEditor";
 
-export default function Answer({ id, postId, postUser, postQuestion }) {
+export default function Answer({
+    id,
+    postId,
+    postUser,
+    postQuestion,
+    hasAnswered,
+}) {
     console.log("AnswerID", id);
     const { user: authUser } = useContext(AuthContext);
     const { loading, data: answer } = useQuery(FETCH_ANSWER_QUERY, {
@@ -44,6 +50,14 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
             },
         }
     );
+
+    useEffect(() => {
+        if (answerUser) {
+            if (answerUser.getUser.id === authUser.id) {
+                hasAnswered();
+            }
+        }
+    }, [answerUser, authUser, hasAnswered]);
 
     useEffect(() => {
         if (!loading) {
@@ -69,7 +83,13 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
                 }),
             };
             data.getAnswer = { ...data.getAnswer, ...result.data.upvoteAnswer };
-            proxy.writeQuery({ query: FETCH_ANSWER_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_ANSWER_QUERY,
+                variables: {
+                    answerId: id,
+                },
+                data,
+            });
         },
     });
 
@@ -90,16 +110,31 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
                 ...data.getAnswer,
                 ...result.data.downvoteAnswer,
             };
-            proxy.writeQuery({ query: FETCH_ANSWER_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_ANSWER_QUERY,
+                variables: {
+                    answerId: id,
+                },
+                data,
+            });
         },
     });
 
     const [IsModalOpen, setIsModalOpen] = useState(false);
 
-    const { onChange, onSubmit, values } = useForm(editAnswerCallback, {
+    const [values, setValues] = useState({
         answerId: id,
-        body: "",
+        body: JSON.stringify([
+            {
+                type: "paragraph",
+                children: [{ text: "This is editable " }],
+            },
+        ]),
     });
+
+    const onChange = (body) => {
+        setValues({ ...values, body: JSON.stringify(body) });
+    };
 
     useEffect(() => {
         if (!loading) {
@@ -113,20 +148,21 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
             const data = {
                 ...proxy.readQuery({
                     query: FETCH_ANSWER_QUERY,
-                    variables: {
-                        answerId: id,
-                    },
+                    variables: { answerId: id },
                 }),
             };
             data.getAnswer = {
                 ...data.getAnswer,
                 ...result.data.editAnswer,
             };
-            proxy.writeQuery({ query: FETCH_ANSWER_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_ANSWER_QUERY,
+                variables: { answerId: id },
+                data,
+            });
         },
     });
     function editAnswerCallback() {
-        console.log(values);
         editAnswer();
         setIsModalOpen(false);
     }
@@ -156,7 +192,13 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
                     ],
                 };
                 //console.log(data.getPost.answers);
-                proxy.writeQuery({ query: FETCH_POST_QUERY, data });
+                proxy.writeQuery({
+                    query: FETCH_POST_QUERY,
+                    variables: {
+                        answerId: id,
+                    },
+                    data,
+                });
             } else {
                 console.log("Server failed to remove Answer!");
             }
@@ -167,32 +209,44 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
 
     const [IsModalOpenComment, setIsModalOpenComment] = useState(false);
 
-    const {
-        onChange: onChangeComment,
-        onSubmit: onSubmitComment,
-        values: valuesComment,
-    } = useForm(createCommentCallback, {
+    const [valuesComment, setValuesComment] = useState({
         answerId: id,
-        body: "",
+        body: JSON.stringify([
+            {
+                type: "paragraph",
+                children: [{ text: "This is editable " }],
+            },
+        ]),
     });
 
+    const onChangeComment = (body) => {
+        setValuesComment({ ...valuesComment, body: JSON.stringify(body) });
+    };
+
     const [createComment] = useMutation(CREATE_COMMENT_MUTATION, {
-        variables: values,
+        variables: valuesComment,
         update(proxy, result) {
             const data = {
                 ...proxy.readQuery({
                     query: FETCH_ANSWER_QUERY,
-                    variables: {
-                        answerId: id,
-                    },
+                    variables: { answerId: id },
                 }),
             };
             data.getAnswer = {
                 ...data.getAnswer,
                 ...result.data.createComment,
             };
-            proxy.writeQuery({ query: FETCH_ANSWER_QUERY, data });
-            values.body = "";
+            proxy.writeQuery({
+                query: FETCH_ANSWER_QUERY,
+                variables: { answerId: id },
+                data,
+            });
+            valuesComment.body = JSON.stringify([
+                {
+                    type: "paragraph",
+                    children: [{ text: "This is editable " }],
+                },
+            ]);
         },
     });
 
@@ -230,59 +284,70 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
                 }}
             >
                 <span>
-                    {answer.getAnswer.body}
-                    <br />
-                    <span
-                        style={{
-                            position: "absolute",
-                            color: "gray",
-                            fontSize: "small",
-                            display: "flex",
-                            right: "0px",
-                        }}
-                    ></span>
+                    <SlateEditor
+                        readOnly={true}
+                        value={JSON.parse(answer.getAnswer.body)}
+                    />
+                    {/*
+                        <>
+                        <br />
+                        <span
+                            style={{
+                                position: "absolute",
+                                color: "gray",
+                                fontSize: "small",
+                                display: "flex",
+                                right: "0px",
+                            }}
+                        />
+                        </>
+                    */}
                 </span>
             </p>
             <div className="post__footer">
                 <div className="post__footerAction">
                     <ArrowUpwardOutlinedIcon onClick={upvoteAnswer} />
-                    {answer.getAnswer.upvoteCount}
+                    <span className="values">
+                        {answer.getAnswer.upvoteCount}
+                    </span>
                     <span>|</span>
                     <ArrowDownwardOutlinedIcon onClick={downvoteAnswer} />
-                    {answer.getAnswer.downvoteCount}
+                    {/*answer.getAnswer.downvoteCount*/}
                 </div>
 
                 <ChatBubbleOutlineOutlinedIcon
                     onClick={() => setShowComments(!showComments)}
                 />
+                <span className="values">{answer.getAnswer.commentCount}</span>
+
                 <InputModal
                     {...{
                         title: "Comment",
                         action: "commented",
                         IsModalOpen: IsModalOpenComment,
                         setIsModalOpen: setIsModalOpenComment,
-                        onSubmit: onSubmitComment,
+                        callBack: createCommentCallback,
                         onChange: onChangeComment,
                         values: valuesComment,
                     }}
                 />
-                {answer.getAnswer.commentCount}
+
                 <div className="post__footerLeft">
                     <MoreMenu
                         {...{
-                            Edit: () => {
-                                if (authUser.id === answer.getAnswer.user)
-                                    setIsModalOpen(true);
+                            Edit: {
+                                func: () => setIsModalOpen(true),
+                                show: authUser.id === answer.getAnswer.user,
                             },
-                            Delete: () => {
-                                if (
+                            Delete: {
+                                func: deleteAnswer,
+                                show:
                                     authUser.id === answer.getAnswer.user ||
-                                    authUser.id === postUser
-                                )
-                                    deleteAnswer();
+                                    authUser.id === postUser,
                             },
-                            Comment: () => {
-                                setIsModalOpenComment(true);
+                            Comment: {
+                                func: () => setIsModalOpenComment(true),
+                                show: true,
                             },
                         }}
                     />
@@ -294,12 +359,12 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
                     style={{
                         overlay: {
                             width: 680,
-                            height: 550,
-                            backgroundColor: "rgba(0,0,0,0.8)",
+                            height: 650,
+                            background: "none",
                             zIndex: "1000",
                             top: "50%",
                             left: "50%",
-                            marginTop: "-250px",
+                            marginTop: "-200px",
                             marginLeft: "-350px",
                         },
                     }}
@@ -307,33 +372,35 @@ export default function Answer({ id, postId, postUser, postQuestion }) {
                     <div className="modal__question">
                         <h1>{postQuestion}</h1>
                         <p>
-                            answer last updated on{" "}
+                            answer last updated{" "}
                             <span className="name">
                                 {moment(answer.getAnswer.createdAt).fromNow()}
                             </span>
                         </p>
                     </div>
-                    <Form onSubmit={onSubmit}>
-                        <div className="modal__answer">
-                            <textarea
-                                name="body"
-                                onChange={onChange}
-                                value={values.body}
-                                placeholder="Enter Your Answer"
-                            />
-                        </div>
-                        <div className="modal__button">
-                            <button
-                                className="cancle"
-                                onClick={() => setIsModalOpen(false)}
-                            >
-                                Cancel
-                            </button>
-                            <Button type="sumbit" className="add">
-                                Submit
-                            </Button>
-                        </div>
-                    </Form>
+
+                    <div className="modal__Field modal__SlateField">
+                        <SlateEditor
+                            onChange={onChange}
+                            value={JSON.parse(values.body)}
+                            placeholder="Enter Your Answer"
+                        />
+                    </div>
+                    <div className="modal__button">
+                        <button
+                            className="cancle"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                        <Button
+                            type="sumbit"
+                            className="add"
+                            onClick={editAnswerCallback}
+                        >
+                            Submit
+                        </Button>
+                    </div>
                 </Modal>
             </div>
             <div className="post__answer">

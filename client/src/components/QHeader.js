@@ -44,7 +44,8 @@ function QHeader(props) {
             data.getPosts = [result.data.createPost, ...data.getPosts];
             //console.log(data.getPosts);
             proxy.writeQuery({ query: FETCH_POSTS_QUERY, data });
-            values.body = "";
+            values.question = "";
+            values.imageUrl = "";
         },
     });
 

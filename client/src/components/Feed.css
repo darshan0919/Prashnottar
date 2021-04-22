@@ -1,5 +1,11 @@
 .feed {
-  display: flex;
-  flex-direction: column;
-  flex: 0.6;
+    display: flex;
+    flex-direction: column;
+    width: 620px;
+    max-height: 87vh;
+    overflow-y: scroll;
+}
+
+.feed::-webkit-scrollbar {
+    display: none;
 }

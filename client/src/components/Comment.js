@@ -26,6 +26,7 @@ import { AuthContext } from "../context/auth";
 import Reply from "./Reply";
 import InputModal from "./InputModal";
 import moment from "moment";
+import SlateEditor from "./SlateEditor";
 
 export default function Comment({ id, answerId, answerUser }) {
     //console.log("Comment", id);
@@ -74,7 +75,13 @@ export default function Comment({ id, answerId, answerUser }) {
                 ...data.getComment,
                 ...result.data.upvoteComment,
             };
-            proxy.writeQuery({ query: FETCH_COMMENT_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_COMMENT_QUERY,
+                variables: {
+                    commentId: id,
+                },
+                data,
+            });
         },
     });
 
@@ -95,16 +102,31 @@ export default function Comment({ id, answerId, answerUser }) {
                 ...data.getComment,
                 ...result.data.downvoteComment,
             };
-            proxy.writeQuery({ query: FETCH_COMMENT_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_COMMENT_QUERY,
+                variables: {
+                    commentId: id,
+                },
+                data,
+            });
         },
     });
 
     const [IsModalOpen, setIsModalOpen] = useState(false);
 
-    const { onChange, onSubmit, values } = useForm(editCommentCallback, {
+    const [values, setValues] = useState({
         commentId: id,
-        body: "",
+        body: JSON.stringify([
+            {
+                type: "paragraph",
+                children: [{ text: "This is editable " }],
+            },
+        ]),
     });
+
+    const onChange = (body) => {
+        setValues({ ...values, body: JSON.stringify(body) });
+    };
 
     useEffect(() => {
         if (!loading) {
@@ -127,7 +149,13 @@ export default function Comment({ id, answerId, answerUser }) {
                 ...data.getComment,
                 ...result.data.editComment,
             };
-            proxy.writeQuery({ query: FETCH_COMMENT_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_COMMENT_QUERY,
+                variables: {
+                    commentId: id,
+                },
+                data,
+            });
         },
     });
     function editCommentCallback() {
@@ -161,7 +189,11 @@ export default function Comment({ id, answerId, answerUser }) {
                     ],
                 };
                 //console.log(data.getAnswer.comments);
-                proxy.writeQuery({ query: FETCH_ANSWER_QUERY, data });
+                proxy.writeQuery({
+                    query: FETCH_ANSWER_QUERY,
+                    variables: { answerId },
+                    data,
+                });
             } else {
                 console.log("Server failed to delete comment!");
             }
@@ -170,14 +202,19 @@ export default function Comment({ id, answerId, answerUser }) {
 
     const [IsModalOpenReply, setIsModalOpenReply] = useState(false);
 
-    const {
-        onChange: onChangeReply,
-        onSubmit: onSubmitReply,
-        values: valuesReply,
-    } = useForm(createReplyCallback, {
+    const [valuesReply, setValuesReply] = useState({
         commentId: id,
-        body: "",
+        body: JSON.stringify([
+            {
+                type: "paragraph",
+                children: [{ text: "This is editable " }],
+            },
+        ]),
     });
+
+    const onChangeReply = (body) => {
+        setValuesReply({ ...valuesReply, body: JSON.stringify(body) });
+    };
 
     const [createReply] = useMutation(CREATE_REPLY_MUTATION, {
         variables: valuesReply,
@@ -194,8 +231,19 @@ export default function Comment({ id, answerId, answerUser }) {
                 ...data.getComment,
                 ...result.data.createReply,
             };
-            proxy.writeQuery({ query: FETCH_COMMENT_QUERY, data });
-            valuesReply.body = "";
+            proxy.writeQuery({
+                query: FETCH_COMMENT_QUERY,
+                variables: {
+                    commentId: id,
+                },
+                data,
+            });
+            valuesReply.body = JSON.stringify([
+                {
+                    type: "paragraph",
+                    children: [{ text: "This is editable " }],
+                },
+            ]);
         },
     });
 
@@ -232,7 +280,13 @@ export default function Comment({ id, answerId, answerUser }) {
                 replyCount: data.getComment.replyCount - 1,
             };
             //console.log(data.getComment.replys);
-            proxy.writeQuery({ query: FETCH_COMMENT_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_COMMENT_QUERY,
+                variables: {
+                    commentId: id,
+                },
+                data,
+            });
         },
     });
 
@@ -248,10 +302,11 @@ export default function Comment({ id, answerId, answerUser }) {
     return loading ? (
         <></>
     ) : (
-        <div key={id} className="post__single__answer comment">
+        <div key={id} className="post__single__answer single__comment">
             <div className="answer__info">
                 <div className="post__info">
                     <Avatar
+                        className="comment"
                         src={
                             commentUser
                                 ? commentUser.getUser.photo
@@ -276,26 +331,23 @@ export default function Comment({ id, answerId, answerUser }) {
                 }}
             >
                 <span>
-                    {comment.getComment.body}
-                    <br />
-                    <span
-                        style={{
-                            position: "absolute",
-                            color: "gray",
-                            fontSize: "small",
-                            display: "flex",
-                            right: "0px",
-                        }}
-                    ></span>
+                    <SlateEditor
+                        readOnly={true}
+                        value={JSON.parse(comment.getComment.body)}
+                    />
                 </span>
             </p>
             <div className="post__footer">
                 <div className="post__footerAction">
                     <ArrowUpwardOutlinedIcon onClick={upvoteComment} />
-                    {comment.getComment.upvoteCount}
+                    <span className="values">
+                        {comment.getComment.upvoteCount}
+                    </span>
                     <span>|</span>
                     <ArrowDownwardOutlinedIcon onClick={downvoteComment} />
-                    {comment.getComment.downvoteCount}
+                    {/*<span className="values">
+                        {comment.getComment.downvoteCount}
+                    </span>*/}
                 </div>
 
                 <ReplyIcon
@@ -310,7 +362,7 @@ export default function Comment({ id, answerId, answerUser }) {
                         action: "replied",
                         IsModalOpen: IsModalOpenReply,
                         setIsModalOpen: setIsModalOpenReply,
-                        onSubmit: onSubmitReply,
+                        callBack: createReplyCallback,
                         onChange: onChangeReply,
                         values: valuesReply,
                     }}
@@ -319,19 +371,19 @@ export default function Comment({ id, answerId, answerUser }) {
                 <div className="post__footerLeft">
                     <MoreMenu
                         {...{
-                            Edit: () => {
-                                if (authUser.id === comment.getComment.user)
-                                    setIsModalOpen(true);
+                            Edit: {
+                                func: () => setIsModalOpen(true),
+                                show: authUser.id === comment.getComment.user,
                             },
-                            Delete: () => {
-                                if (
+                            Delete: {
+                                func: deleteComment,
+                                show:
                                     authUser.id === comment.getComment.user ||
-                                    authUser.id === answerUser
-                                )
-                                    deleteComment();
+                                    authUser.id === answerUser,
                             },
-                            Reply: () => {
-                                setIsModalOpenReply(true);
+                            Reply: {
+                                func: () => setIsModalOpenReply(true),
+                                show: true,
                             },
                         }}
                     />
@@ -355,33 +407,34 @@ export default function Comment({ id, answerId, answerUser }) {
                 >
                     <div className="modal__question">
                         <p>
-                            comment last updated on{" "}
+                            comment last updated{" "}
                             <span className="name">
                                 {moment(comment.getComment.createdAt).fromNow()}
                             </span>
                         </p>
                     </div>
-                    <Form onSubmit={onSubmit}>
-                        <div className="modal__comment">
-                            <textarea
-                                name="body"
-                                onChange={onChange}
-                                value={values.body}
-                                placeholder="Enter Your Comment"
-                            />
-                        </div>
-                        <div className="modal__button">
-                            <button
-                                className="cancle"
-                                onClick={() => setIsModalOpen(false)}
-                            >
-                                Cancel
-                            </button>
-                            <Button type="sumbit" className="add">
-                                Submit
-                            </Button>
-                        </div>
-                    </Form>
+                    <div className="modal__Field modal__SlateField">
+                        <SlateEditor
+                            onChange={onChange}
+                            value={JSON.parse(values.body)}
+                            placeholder="Enter Your Comment"
+                        />
+                    </div>
+                    <div className="modal__button">
+                        <button
+                            className="cancle"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                        <Button
+                            type="sumbit"
+                            className="add"
+                            onClick={editCommentCallback}
+                        >
+                            Submit
+                        </Button>
+                    </div>
                 </Modal>
             </div>
             {

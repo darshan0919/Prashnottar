@@ -4,34 +4,47 @@
     align-items: center;
     padding: 1px;
     background-color: white;
-    width: 100%;
+    width: 100vw;
 
     position: sticky;
     z-index: 1000;
     top: 0;
+    left: 0;
+    right: 0;
     box-shadow: 0px 5px 8px -9px rgba(0, 0, 0, 0.5);
 }
 
 .qHeader__logo > img {
     height: 30px;
-    margin-right: 20px;
+    margin-right: 40px;
 }
 
 .qHeader__icons {
     display: flex;
     align-items: center;
     cursor: pointer;
+    height: 50px;
 }
 
 .qHeader__icons > .active {
-    color: #8f1f1b;
+    color: #a5231f;
+    border-bottom: 2px solid #a5231f;
+    border-radius: -20px;
 }
 
 .qHeader__icon {
-    font-size: xx-large;
     background-color: white;
-    padding: 5px 20px;
+    padding: 0px 15px;
+    display: flex;
+    align-items: center;
+    height: 50px;
     color: gray;
+    margin-right: 10px;
+}
+
+.qHeader__icon > .MuiSvgIcon-root {
+    font-size: 35px;
+    height: 30px;
 }
 
 .qHeader__icon:hover {
@@ -47,6 +60,7 @@
     padding: 5px;
     border-radius: 5px;
     margin-left: 5px;
+    width: 300px;
 }
 
 .qHeader__input > input {
@@ -61,8 +75,16 @@
 }
 
 .qHeader__avatar {
+    display: flex;
+    position: relative;
     cursor: pointer;
 }
+
+.qHeader__avatar > .MuiAvatar-root {
+    height: 32px;
+    width: 32px;
+}
+
 .qHeader__Rem {
     display: flex;
     align-items: center;
@@ -85,10 +107,10 @@
     text-transform: inherit;
     border-radius: 20px;
     margin-left: 25px;
+    font-weight: 600;
 }
 
 .qHeader__Rem > .MuiButton-root:hover {
-    color: #ffffff;
     background: #8f1f1b;
 }
 
@@ -139,6 +161,22 @@
     flex-direction: column;
     margin-top: 30px;
     flex: 1;
+    padding: 10px;
+    min-height: 300px;
+}
+
+.modal__SlateField {
+    border: 1px solid lightgray;
+    border-radius: 2px;
+}
+
+.modal__editableField {
+    max-height: 290px;
+    overflow-y: scroll;
+}
+
+.modal__editableField::-webkit-scrollbar {
+    display: none;
 }
 
 .modal__Field > .modal__fieldLink {
@@ -158,9 +196,7 @@
 .modal__buttons {
     display: flex;
     align-items: center;
-    margin-top: 260px;
-    margin-right: -20px;
-    border-top: 1px solid lightgray;
+    margin: 10px -10px 0px 0px;
 }
 
 .modal__buttons > .cancle {

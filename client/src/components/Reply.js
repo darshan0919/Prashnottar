@@ -23,6 +23,7 @@ import { useForm } from "../util/hooks";
 import { AuthContext } from "../context/auth";
 import moment from "moment";
 import InputModal from "./InputModal";
+import SlateEditor from "./SlateEditor";
 
 export default function Reply({
     id,
@@ -75,7 +76,11 @@ export default function Reply({
                 ...data.getReply,
                 ...result.data.upvoteReply,
             };
-            proxy.writeQuery({ query: FETCH_REPLY_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_REPLY_QUERY,
+                variables: { replyId: id },
+                data,
+            });
         },
     });
 
@@ -96,16 +101,31 @@ export default function Reply({
                 ...data.getReply,
                 ...result.data.downvoteReply,
             };
-            proxy.writeQuery({ query: FETCH_REPLY_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_REPLY_QUERY,
+                variables: {
+                    replyId: id,
+                },
+                data,
+            });
         },
     });
 
     const [IsModalOpen, setIsModalOpen] = useState(false);
 
-    const { onChange, onSubmit, values } = useForm(editReplyCallback, {
+    const [values, setValues] = useState({
         replyId: id,
-        body: "",
+        body: JSON.stringify([
+            {
+                type: "paragraph",
+                children: [{ text: "This is editable " }],
+            },
+        ]),
     });
+
+    const onChange = (body) => {
+        setValues({ ...values, body: JSON.stringify(values.body) });
+    };
 
     useEffect(() => {
         if (!loading) {
@@ -128,7 +148,13 @@ export default function Reply({
                 ...data.getReply,
                 ...result.data.editReply,
             };
-            proxy.writeQuery({ query: FETCH_REPLY_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_REPLY_QUERY,
+                variables: {
+                    replyId: id,
+                },
+                data,
+            });
         },
     });
     function editReplyCallback() {
@@ -139,14 +165,19 @@ export default function Reply({
 
     const [IsModalOpenReply, setIsModalOpenReply] = useState(false);
 
-    const {
-        onChange: onChangeReply,
-        onSubmit: onSubmitReply,
-        values: valuesReply,
-    } = useForm(createReplyCallback, {
+    const [valuesReply, setValuesReply] = useState({
         replyId: id,
-        body: "",
+        body: JSON.stringify([
+            {
+                type: "paragraph",
+                children: [{ text: "This is editable " }],
+            },
+        ]),
     });
+
+    const onChangeReply = (body) => {
+        setValuesReply({ ...valuesReply, body: JSON.stringify(body) });
+    };
 
     const [createReply] = useMutation(CREATE_REREPLY_MUTATION, {
         variables: valuesReply,
@@ -154,9 +185,7 @@ export default function Reply({
             const data = {
                 ...proxy.readQuery({
                     query: FETCH_REPLY_QUERY,
-                    variables: {
-                        replyId: id,
-                    },
+                    variables: { replyId: id },
                 }),
             };
             console.log(data.getReply);
@@ -171,11 +200,17 @@ export default function Reply({
                 variables: { replyId: id },
                 data,
             });
-            valuesReply.body = "";
+            valuesReply.body = JSON.stringify([
+                {
+                    type: "paragraph",
+                    children: [{ text: "This is editable " }],
+                },
+            ]);
         },
     });
 
     function createReplyCallback() {
+        //console.log(valuesReply);
         createReply();
         setIsModalOpenReply(false);
     }
@@ -205,7 +240,13 @@ export default function Reply({
                 replyCount: data.getReply.replyCount - 1,
             };
             //console.log(data.getReply.replys);
-            proxy.writeQuery({ query: FETCH_REPLY_QUERY, data });
+            proxy.writeQuery({
+                query: FETCH_REPLY_QUERY,
+                variables: {
+                    replyId: parentId,
+                },
+                data,
+            });
         },
     });
 
@@ -215,10 +256,11 @@ export default function Reply({
     return loading || !replyUser ? (
         <></>
     ) : (
-        <div key={id} className="post__single__answer reply">
+        <div key={id} className="post__single__answer single__reply">
             <div className="answer__info">
                 <div className="post__info">
                     <Avatar
+                        className="reply"
                         src={
                             replyUser
                                 ? replyUser.getUser.photo
@@ -226,7 +268,7 @@ export default function Reply({
                         }
                     />
                     <div className="reply__info">
-                        <h4>{replyUser ? replyUser.getUser.username : ""}</h4>
+                        <h5>{replyUser ? replyUser.getUser.username : ""}</h5>
                         <small>
                             {moment(reply.getReply.createdAt).fromNow()}
                         </small>
@@ -241,26 +283,21 @@ export default function Reply({
                 }}
             >
                 <span>
-                    {reply.getReply.body}
-                    <br />
-                    <span
-                        style={{
-                            position: "absolute",
-                            color: "gray",
-                            fontSize: "small",
-                            display: "flex",
-                            right: "0px",
-                        }}
-                    ></span>
+                    <SlateEditor
+                        readOnly={true}
+                        value={JSON.parse(reply.getReply.body)}
+                    />
                 </span>
             </p>
             <div className="post__footer">
                 <div className="post__footerAction">
                     <ArrowUpwardOutlinedIcon onClick={upvoteReply} />
-                    {reply.getReply.upvoteCount}
+                    <span className="values">{reply.getReply.upvoteCount}</span>
                     <span>|</span>
                     <ArrowDownwardOutlinedIcon onClick={downvoteReply} />
-                    {reply.getReply.downvoteCount}
+                    {/*<span className="values">
+                        {reply.getReply.downvoteCount}
+            </span>*/}
                 </div>
 
                 <ReplyIcon
@@ -275,7 +312,7 @@ export default function Reply({
                         action: "replied",
                         IsModalOpen: IsModalOpenReply,
                         setIsModalOpen: setIsModalOpenReply,
-                        onSubmit: onSubmitReply,
+                        callBack: createReplyCallback,
                         onChange: onChangeReply,
                         values: valuesReply,
                     }}
@@ -283,22 +320,23 @@ export default function Reply({
                 <div className="post__footerLeft">
                     <MoreMenu
                         {...{
-                            Edit: () => {
-                                if (authUser.id === reply.getReply.user)
-                                    setIsModalOpen(true);
+                            Edit: {
+                                func: () => setIsModalOpen(true),
+                                show: authUser.id === reply.getReply.user,
                             },
-                            Delete: () => {
-                                if (
-                                    authUser.id === reply.getReply.user ||
-                                    authUser.id === parentUser ||
-                                    authUser.id === commentUser
-                                ) {
+                            Delete: {
+                                func: () => {
                                     if (commentId) deleteReplyComment();
                                     else deleteReply();
-                                }
+                                },
+                                show:
+                                    authUser.id === reply.getReply.user ||
+                                    authUser.id === parentUser ||
+                                    authUser.id === commentUser,
                             },
-                            Reply: () => {
-                                setIsModalOpenReply(true);
+                            Reply: {
+                                func: () => setIsModalOpenReply(true),
+                                show: true,
                             },
                         }}
                     />
@@ -322,33 +360,34 @@ export default function Reply({
                 >
                     <div className="modal__question">
                         <p>
-                            reply last updated on{" "}
+                            reply last updated{" "}
                             <span className="name">
                                 {moment(reply.getReply.createdAt).fromNow()}
                             </span>
                         </p>
                     </div>
-                    <Form onSubmit={onSubmit}>
-                        <div className="modal__answer">
-                            <textarea
-                                name="body"
-                                onChange={onChange}
-                                value={values.body}
-                                placeholder="Enter Your Reply"
-                            />
-                        </div>
-                        <div className="modal__button">
-                            <button
-                                className="cancle"
-                                onClick={() => setIsModalOpen(false)}
-                            >
-                                Cancel
-                            </button>
-                            <Button type="sumbit" className="add">
-                                Submit
-                            </Button>
-                        </div>
-                    </Form>
+                    <div className="modal__Field modal__SlateField">
+                        <SlateEditor
+                            onChange={onChange}
+                            value={JSON.parse(values.body)}
+                            placeholder="Enter Your Reply"
+                        />
+                    </div>
+                    <div className="modal__button">
+                        <button
+                            className="cancle"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                        <Button
+                            type="sumbit"
+                            className="add"
+                            onClick={editReplyCallback}
+                        >
+                            Submit
+                        </Button>
+                    </div>
                 </Modal>
             </div>
             {

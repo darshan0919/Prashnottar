@@ -1,7 +1,25 @@
+body {
+    background-color: rgb(246, 246, 246);
+}
+
+.quora {
+    margin: 0;
+    background-color: rgb(246, 246, 246);
+    height: auto;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 .quora__content {
     display: flex;
     justify-content: center;
-    margin-top: 50px;
+    margin-top: 20px;
+    font-size: 15px;
+    background-color: rgb(246, 246, 246);
+    width: 70vw;
 }
 
 .quora__content__singlepost {
