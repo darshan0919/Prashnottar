@@ -189,6 +189,7 @@ function Post({ id, singleAnswer }) {
             <div className="post__info">
                 <Avatar src={postUser.getUser.photo} />
                 <h4>{postUser.getUser.username}</h4>
+                <span>·</span>
                 <small>{moment(post.getPost.createdAt).fromNow()} </small>
                 <div className="MenuButton">
                     <MoreMenu

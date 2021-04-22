@@ -30,8 +30,14 @@
     text-decoration: underline;
 }
 
+.post__info > span {
+    color: gray;
+    margin: 0px 6px 0px 6px;
+}
+
 .post__info > small {
-    margin-left: 10px;
+    color: gray;
+    font-size: 13px;
 }
 
 .post__info > .MenuButton {
@@ -88,7 +94,8 @@
 }
 
 .post__single__answer > p {
-    margin: 10px 0px 10px 8px;
+    margin: 10px 0px 0px 8px;
+    padding-bottom: 0px;
     font-size: 15px;
 }
 
@@ -116,6 +123,7 @@
 
 .post__footer > .values {
     margin-bottom: 2px;
+    color: gray;
 }
 
 .post__footerAction {

@@ -59,6 +59,7 @@ const SlateEditor = (props) => {
                     <MarkButton format="code" icon="code" />
                     <BlockButton format="heading-one" icon="looks_one" />
                     <BlockButton format="heading-two" icon="looks_two" />
+                    <BlockButton format="heading-three" icon="looks_3" />
                     <BlockButton format="block-quote" icon="format_quote" />
                     <BlockButton
                         format="numbered-list"
@@ -163,6 +164,8 @@ const Element = (props) => {
             return <h1 {...attributes}>{children}</h1>;
         case "heading-two":
             return <h2 {...attributes}>{children}</h2>;
+        case "heading-three":
+            return <h3 {...attributes}>{children}</h3>;
         case "list-item":
             return <li {...attributes}>{children}</li>;
         case "numbered-list":

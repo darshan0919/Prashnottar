@@ -269,6 +269,7 @@ export default function Reply({
                     />
                     <div className="reply__info">
                         <h5>{replyUser ? replyUser.getUser.username : ""}</h5>
+                        <span>·</span>
                         <small>
                             {moment(reply.getReply.createdAt).fromNow()}
                         </small>

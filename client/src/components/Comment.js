@@ -317,6 +317,7 @@ export default function Comment({ id, answerId, answerUser }) {
                         <h4>
                             {commentUser ? commentUser.getUser.username : ""}
                         </h4>
+                        <span>·</span>
                         <small>
                             {moment(comment.getComment.createdAt).fromNow()}
                         </small>

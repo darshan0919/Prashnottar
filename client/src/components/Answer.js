@@ -271,6 +271,7 @@ export default function Answer({
                         }
                     />
                     <h4>{answerUser ? answerUser.getUser.username : ""}</h4>
+                    <span>·</span>
                     <small>
                         {moment(answer.getAnswer.createdAt).fromNow()}
                     </small>
