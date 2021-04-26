@@ -2,9 +2,9 @@ import React, { useState } from "react";
 
 import "./Home.css";
 
-import QHeader from "../components/QHeader";
-import Feed from "../components/Feed";
-import Widget from "../components/Widget";
+import QHeader from "../components/navbar/QHeader";
+import Feed from "../components/post/Feed";
+import Widget from "../components/widget/Widget";
 
 export default function SinglePost(props) {
     const [id] = useState(props.match.params.postId);

@@ -40,22 +40,6 @@ module.exports = {
             const comment = await Comment.findById(commentId);
 
             if (comment) {
-                /*const replyIndex = await asyncFindIndex(
-                    comment.replys,
-                    async (c) => {
-                        const { user } = await Reply.findById(c);
-                        console.log(user, id);
-                        return user == id;
-                    }
-                );
-
-                if (replyIndex >= 0) {
-                    console.log(
-                        "You have already entered the reply, edit reply functionality will be added soon:)"
-                    );
-                    return comment;
-                }*/
-
                 const newReply = new Reply({
                     body,
                     user: id,
@@ -69,10 +53,10 @@ module.exports = {
                 comment.replys.unshift(reply.id);
                 await comment.save();
                 console.log(comment.replys);
-                return comment;
+                return reply;
             } else throw new UserInputError("Comment not found");
         },
-        createReReply: async (_, { replyId, body }, context) => {
+        createRereply: async (_, { replyId, body }, context) => {
             //console.log("Creating new Reply!");
             const { username, id } = checkAuth(context);
 
@@ -87,22 +71,6 @@ module.exports = {
             const reply = await Reply.findById(replyId);
 
             if (reply) {
-                /*const replyIndex = await asyncFindIndex(
-                    reply.replys,
-                    async (c) => {
-                        const { user } = await Reply.findById(c);
-                        console.log(user, id);
-                        return user == id;
-                    }
-                );
-
-                if (replyIndex >= 0) {
-                    console.log(
-                        "You have already entered the reply, edit reply functionality will be added soon:)"
-                    );
-                    return reply;
-                }*/
-
                 const newReply = new Reply({
                     body,
                     user: id,
@@ -112,10 +80,10 @@ module.exports = {
 
                 const rereply = await newReply.save();
 
-                reply.replys.unshift(rereply.id);
+                reply.rereplys.unshift(rereply.id);
                 await reply.save();
                 //console.log(reply.replys);
-                return reply;
+                return rereply;
             } else throw new UserInputError("Reply not found");
         },
         editReply: async (_, { replyId, body }, context) => {
@@ -158,8 +126,6 @@ module.exports = {
                             (reply) => reply === replyId
                         );
 
-                        //console.log(reply.user, id);
-
                         if (reply.user == id || comment.user == id) {
                             reply.upvotes.forEach((upvoteId) => {
                                 deleteVote({ upvoteId });
@@ -169,47 +135,46 @@ module.exports = {
                                 deleteVote({ downvoteId });
                             });
 
-                            const result = { id: reply.id };
+                            reply.rereplys.forEach((replyId) => {
+                                deleteReply({ replyId });
+                            });
+
                             await reply.delete();
 
                             //console.log(replyIndex);
                             comment.replys.splice(replyIndex, 1);
                             await comment.save();
-                            return result;
+                            return { id: replyId };
                         } else {
                             throw new AuthenticationError("Action not allowed");
                         }
                     } else throw new UserInputError("Comment not found");
                 } else {
-                    const rereply = await Comment.findById(reply.reply);
+                    const parentReply = await Reply.findById(reply.reply);
 
-                    if (rereply) {
+                    if (parentReply) {
                         const replyIndex = await asyncFindIndex(
-                            rereply.replys,
+                            parentReply.rereplys,
                             (reply) => reply === replyId
                         );
 
-                        //console.log(reply.user, id);
+                        reply.upvotes.forEach((upvoteId) => {
+                            deleteVote({ upvoteId });
+                        });
 
-                        if (reply.user == id || rereply.user == id) {
-                            reply.upvotes.forEach((upvoteId) => {
-                                deleteVote({ upvoteId });
-                            });
+                        reply.downvotes.forEach((downvoteId) => {
+                            deleteVote({ downvoteId });
+                        });
 
-                            reply.downvotes.forEach((downvoteId) => {
-                                deleteVote({ downvoteId });
-                            });
+                        reply.rereplys.forEach((replyId) => {
+                            deleteReply({ replyId });
+                        });
 
-                            const result = { id: reply.id };
-                            await reply.delete();
+                        await reply.delete();
 
-                            //console.log(replyIndex);
-                            rereply.replys.splice(replyIndex, 1);
-                            await rereply.save();
-                            return result;
-                        } else {
-                            throw new AuthenticationError("Action not allowed");
-                        }
+                        parentReply.rereplys.splice(replyIndex, 1);
+                        await parentReply.save();
+                        return { id: replyId };
                     } else throw new UserInputError("Comment not found");
                 }
             } else {

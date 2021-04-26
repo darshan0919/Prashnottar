@@ -35,8 +35,8 @@ module.exports = gql`
         reply: ID
         comment: ID
         body: String!
-        replys: [ID]
-        replyCount: Int!
+        rereplys: [ID]
+        rereplyCount: Int!
         upvotes: [ID]
         upvoteCount: Int!
         downvotes: [ID]
@@ -85,18 +85,18 @@ module.exports = gql`
         createPost(question: String!, imageUrl: String): Post
         editPost(postId: ID!, question: String!, imageUrl: String): Post
         deletePost(postId: ID!): Post
-        createAnswer(postId: ID!, body: String!): Post
+        createAnswer(postId: ID!, body: String!): Answer
         editAnswer(answerId: ID!, body: String!): Answer
         deleteAnswer(answerId: ID!): Answer
         upvoteAnswer(answerId: ID!): Answer
         downvoteAnswer(answerId: ID!): Answer
-        createComment(answerId: ID!, body: String!): Answer
+        createComment(answerId: ID!, body: String!): Comment
         editComment(commentId: ID!, body: String!): Comment
         deleteComment(commentId: ID!): Comment
         upvoteComment(commentId: ID!): Comment
         downvoteComment(commentId: ID!): Comment
-        createReply(commentId: ID!, body: String!): Comment
-        createReReply(replyId: ID!, body: String!): Reply
+        createReply(commentId: ID!, body: String!): Reply
+        createRereply(replyId: ID!, body: String!): Reply
         editReply(replyId: ID!, body: String!): Reply
         deleteReply(replyId: ID!): Reply
         upvoteReply(replyId: ID!): Reply

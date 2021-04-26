@@ -71,7 +71,7 @@ module.exports = {
 
                 post.answers.unshift(answer.id);
                 await post.save();
-                return post;
+                return answer;
             } else throw new UserInputError("Post not found");
         },
         editAnswer: async (_, { answerId, body }, context) => {

@@ -16,7 +16,7 @@ module.exports = model(
             type: Schema.Types.ObjectId,
             ref: "comments",
         },
-        replys: [
+        rereplys: [
             {
                 type: Schema.Types.ObjectId,
                 ref: "replys",

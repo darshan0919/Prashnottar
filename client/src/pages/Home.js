@@ -1,15 +1,14 @@
 import React from "react";
 
 import "./Home.css";
-
-import QHeader from "../components/QHeader";
-import Sidebar from "../components/Sidebar";
-import Widget from "../components/Widget";
-import Feed from "../components/Feed";
+import QHeader from "../components/navbar/QHeader";
+import Sidebar from "../components/sidebar/Sidebar";
+import Feed from "../components/post/Feed";
+import Widget from "../components/widget/Widget";
 
 function Home() {
     return (
-        <div className="quora">
+        <div className="quora test">
             <QHeader />
             <div className="quora__content">
                 <Sidebar />

@@ -5,6 +5,9 @@ const { Answer, Comment } = require("../../models");
 const {
     Mutation: { deleteVote },
 } = require("./votes");
+const {
+    Mutation: { deleteReply },
+} = require("./replys");
 const { asyncFindIndex } = require("../../util");
 
 module.exports = {
@@ -41,22 +44,6 @@ module.exports = {
             const answer = await Answer.findById(answerId);
 
             if (answer) {
-                /*const commentIndex = await asyncFindIndex(
-                    answer.comments,
-                    async (c) => {
-                        const { user } = await Comment.findById(c);
-                        console.log(user, id);
-                        return user == id;
-                    }
-                );
-
-                if (commentIndex >= 0) {
-                    console.log(
-                        "You have already entered the comment, edit comment functionality will be added soon:)"
-                    );
-                    return answer;
-                }*/
-
                 const newComment = new Comment({
                     body,
                     user: id,
@@ -69,7 +56,7 @@ module.exports = {
                 answer.comments.unshift(comment.id);
                 await answer.save();
                 console.log(answer.comments);
-                return answer;
+                return comment;
             } else throw new UserInputError("Answer not found");
         },
         editComment: async (_, { commentId, body }, context) => {
@@ -111,27 +98,25 @@ module.exports = {
                         (comment) => comment === commentId
                     );
 
-                    //console.log(comment.user, id);
+                    comment.upvotes.forEach((upvoteId) => {
+                        deleteVote({ upvoteId });
+                    });
 
-                    if (comment.user == id || answer.user == id) {
-                        comment.upvotes.forEach((upvoteId) => {
-                            deleteVote({ upvoteId });
-                        });
+                    comment.downvotes.forEach((downvoteId) => {
+                        deleteVote({ downvoteId });
+                    });
 
-                        comment.downvotes.forEach((downvoteId) => {
-                            deleteVote({ downvoteId });
-                        });
+                    comment.replys.forEach((replyId) => {
+                        deleteReply({ replyId });
+                    });
 
-                        const result = { id: comment.id };
-                        await comment.delete();
+                    const result = { id: comment.id };
+                    await comment.delete();
 
-                        //console.log(commentIndex);
-                        answer.comments.splice(commentIndex, 1);
-                        await answer.save();
-                        return result;
-                    } else {
-                        throw new AuthenticationError("Action not allowed");
-                    }
+                    //console.log(commentIndex);
+                    answer.comments.splice(commentIndex, 1);
+                    await answer.save();
+                    return result;
                 } else throw new UserInputError("Answer not found");
             } else {
                 throw new UserInputError("Comment not found");

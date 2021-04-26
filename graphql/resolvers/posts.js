@@ -18,10 +18,9 @@ module.exports = {
         },
         async getPost(_, { postId }) {
             try {
-                let post = await Post.findById(postId);
+                const post = await Post.findById(postId);
 
                 if (post) {
-                    //console.log("post1", post);
                     let answers = await Promise.all(
                         post.answers.map(
                             async (id) => await Answer.findById(id)
@@ -35,7 +34,6 @@ module.exports = {
                     );
                     post.answers = answers.map(({ id }) => id);
                     await post.save();
-                    //console.log("post2", post);
                     return post;
                 } else {
                     throw new Error("Post not found");

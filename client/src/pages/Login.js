@@ -1,38 +1,19 @@
-import React, { useContext, useState } from "react";
+import React from "react";
 import { Button, Form } from "semantic-ui-react";
-import { useMutation } from "@apollo/client";
-
-import { AuthContext } from "../context/auth";
-import { useForm } from "../util/hooks";
-
 import { Link } from "react-router-dom";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import "./Login.css";
-import { LOGIN_USER } from "../util/graphql";
+import { useLoginUserMutation } from "../hooks/user/loginUser";
 
 function Login(props) {
-    const context = useContext(AuthContext);
-    const [errors, setErrors] = useState({});
+    const {
+        errors,
+        onChange,
+        onSubmit,
+        values,
+        loading,
+    } = useLoginUserMutation(props);
 
-    const { onChange, onSubmit, values } = useForm(loginUserCallback, {
-        username: "",
-        password: "",
-    });
-
-    const [loginUser, { loading }] = useMutation(LOGIN_USER, {
-        update(_, { data: { login: userData } }) {
-            context.login(userData);
-            props.history.push("/");
-        },
-        onError(err) {
-            setErrors(err.graphQLErrors[0].extensions.exception.errors);
-        },
-        variables: values,
-    });
-
-    function loginUserCallback() {
-        loginUser();
-    }
     return (
         <div className="login">
             <div className="login__container">

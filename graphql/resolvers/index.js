@@ -19,7 +19,7 @@ module.exports = {
     Reply: {
         upvoteCount: (parent) => parent.upvotes.length,
         downvoteCount: (parent) => parent.downvotes.length,
-        replyCount: (parent) => parent.replys.length,
+        rereplyCount: (parent) => parent.rereplys.length,
     },
     Query: {
         ...usersResolvers.Query,

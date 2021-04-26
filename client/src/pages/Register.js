@@ -1,39 +1,18 @@
-import React, { useContext, useState } from "react";
+import React from "react";
 import { Button, Form } from "semantic-ui-react";
-import { useMutation } from "@apollo/client";
-
-import { AuthContext } from "../context/auth";
-import { useForm } from "../util/hooks";
 
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import "./Login.css";
-import { REGISTER_USER } from "../util/graphql";
+import { useRegisterUserMutation } from "../hooks/user/registerUser";
 
 function Register(props) {
-    const context = useContext(AuthContext);
-    const [errors, setErrors] = useState({});
-
-    const { onChange, onSubmit, values } = useForm(registerUser, {
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-    });
-
-    const [addUser, { loading }] = useMutation(REGISTER_USER, {
-        update(_, { data: { register: userData } }) {
-            context.login(userData);
-            props.history.push("/");
-        },
-        onError(err) {
-            setErrors(err.graphQLErrors[0].extensions.exception.errors);
-        },
-        variables: values,
-    });
-
-    function registerUser() {
-        addUser();
-    }
+    const {
+        errors,
+        onChange,
+        onSubmit,
+        values,
+        loading,
+    } = useRegisterUserMutation(props);
     return (
         <div className="login">
             <div className="login__container">

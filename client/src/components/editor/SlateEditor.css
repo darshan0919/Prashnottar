@@ -1,0 +1,19 @@
+.slate {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    flex: 1;
+    padding: 10px;
+    min-height: 300px;
+    border: 1px solid lightgray;
+    border-radius: 2px;
+}
+
+.slate__editable {
+    max-height: 290px;
+    overflow-y: scroll;
+}
+
+.slate__editable::-webkit-scrollbar {
+    display: none;
+}

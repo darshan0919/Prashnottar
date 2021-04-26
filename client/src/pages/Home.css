@@ -1,3 +1,8 @@
+:root {
+    --blue: rgb(60, 128, 236);
+    --darkblue: rgb(46, 113, 200);
+}
+
 body {
     background-color: rgb(246, 246, 246);
 }

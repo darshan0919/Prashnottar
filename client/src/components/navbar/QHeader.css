@@ -1,0 +1,124 @@
+.qHeader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1px;
+    background-color: white;
+    width: 100vw;
+
+    position: sticky;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0px 5px 8px -9px rgba(0, 0, 0, 0.5);
+}
+
+.qHeader__logo > .logo {
+    color: var(--blue);
+    margin-right: 30px;
+    font-size: 33px;
+    font-family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
+    margin-top: 8px;
+    font-weight: 700;
+}
+
+.qHeader__logo > img {
+    height: 30px;
+    margin-right: 40px;
+}
+
+.qHeader__icons {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    height: 50px;
+}
+
+.qHeader__icons > .active {
+    color: var(--blue);
+    border-bottom: 2px solid var(--blue);
+    border-radius: -20px;
+}
+
+.qHeader__icon {
+    background-color: white;
+    padding: 0px 15px;
+    display: flex;
+    align-items: center;
+    height: 50px;
+    color: gray;
+    margin-right: 10px;
+}
+
+.qHeader__icon > .MuiSvgIcon-root {
+    font-size: 35px;
+    height: 30px;
+}
+
+.qHeader__icon:hover {
+    background-color: rgba(233, 233, 233, 0.5);
+    border-radius: 10px;
+    color: var(--blue);
+}
+
+.qHeader__input {
+    display: flex;
+    align-items: center;
+    border: 1px solid lightgray;
+    padding: 5px;
+    border-radius: 5px;
+    margin-left: 5px;
+    width: 300px;
+}
+
+.qHeader__input > input {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    color: rgb(49, 49, 49);
+}
+
+.qHeader__input {
+    color: gray;
+}
+
+.qHeader__avatar {
+    display: flex;
+    position: relative;
+    cursor: pointer;
+}
+
+.qHeader__avatar > .MuiAvatar-root {
+    height: 32px;
+    width: 32px;
+}
+
+.qHeader__Rem {
+    display: flex;
+    align-items: center;
+    margin-left: 25px;
+}
+
+.qHeader__Rem > .MuiSvgIcon-root {
+    font-size: xx-large;
+    color: gray;
+    margin-left: 25px;
+    cursor: pointer;
+}
+.qHeader__Rem > .MuiSvgIcon-root:hover {
+    color: var(--darkblue);
+}
+
+.qHeader__Rem > .MuiButton-root {
+    color: white;
+    background: var(--blue);
+    text-transform: inherit;
+    border-radius: 20px;
+    margin-left: 25px;
+    font-weight: 600;
+}
+
+.qHeader__Rem > .MuiButton-root:hover {
+    background: var(--darkblue);
+}

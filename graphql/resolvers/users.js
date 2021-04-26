@@ -107,6 +107,7 @@ module.exports = {
             }
             // hash password and create an auth token
             password = await bcrypt.hash(password, 12);
+            //photo = `https://ui-avatars.com/api/?rounded=true&name=${username[0]}&background=6c9eea&color=ecebc5`;
             photo = `https://ui-avatars.com/api/?rounded=true&name=${username[0]}&background=random`;
 
             const newUser = new User({
