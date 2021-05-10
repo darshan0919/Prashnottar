@@ -48,7 +48,7 @@ function QHeader() {
                 react_1["default"].createElement(NotificationsOutlined_1["default"], null))),
         react_1["default"].createElement("div", { className: "qHeader__input" },
             react_1["default"].createElement(Search_1["default"], null),
-            react_1["default"].createElement("input", { type: "text", placeholder: "Search Quora" })),
+            react_1["default"].createElement("input", { type: "text", placeholder: "Search..." })),
         react_1["default"].createElement("div", { className: "qHeader__Rem" },
             react_1["default"].createElement("div", { className: "qHeader__avatar" },
                 react_1["default"].createElement(core_1.Avatar, { onClick: logout, src: user.photo })),
